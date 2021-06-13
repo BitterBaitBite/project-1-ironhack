@@ -9,18 +9,18 @@ class Client extends Entity {
 		/* Aparecer de forma aleatoria la exclamación
         inicia tiempo de exclamación
         if(camarero interactua )
-        desaparece icono && se para tiempo de la exclamación && aparece icono de comida && inicia tiempo de espera de comida 
+            desaparece icono && se para tiempo de la exclamación && aparece icono de comida && inicia tiempo de espera de comida 
         else if(terminar tiempo de comida )
-        desaparece icono && clientes se 'levantan'*/
+            desaparece icono && clientes se 'levantan'*/
 	}
 	waitFood() {
 		/* Se inicia con la interacción el tiempo de espera de comida 
         if(camarero trae su plato correcto)
-        desaparece icono && se quita el tiempo de espera comida ¿¿¿¿¿&& comienza tiempo comiendo ???????? && se resetea
+            desaparece icono && se quita el tiempo de espera comida ¿¿¿¿¿&& comienza tiempo comiendo ???????? && se resetea
         else if(camaero no trae plato correcto)
-        ¿¿¿¿no lo acepta, se van , baja tiempo espera comida???? 
+            ¿¿¿¿no lo acepta, se van , baja tiempo espera comida???? 
         else if(se acaba tiempo espera comida)
-        desaparece icono comida && se 'levantan'*/
+            desaparece icono comida && se 'levantan'*/
 	}
 	timePlayer() {
 		/* Iniciar tiempo de espera al jugador */
@@ -32,14 +32,14 @@ class Client extends Entity {
 		/*Aparecer de forma aleatoria la exclamación
          inicia tiempo de exclamación
          if (camarero interactua)
-        desaparece icono && se para tiempo de la exclamación && aparece icono de comida && inicia tiempo de espera de comida */
+            desaparece icono && se para tiempo de la exclamación && aparece icono de comida && inicia tiempo de espera de comida */
 	}
 	receiveFood() {
 		/* Se inicia con la interacción el tiempo de espera de comida
         if(camarero trae su plato correcto)
-        desaparece icono && se quita el tiempo de espera comida ¿¿¿¿¿&& comienza tiempo comiendo ???????? && se resetea
+            desaparece icono && se quita el tiempo de espera comida ¿¿¿¿¿&& comienza tiempo comiendo ???????? && se resetea
         else if(camaero no trae plato correcto)
-        ¿¿¿¿no lo acepta, se van , baja tiempo espera comida???? */
+            ¿¿¿¿no lo acepta, se van , baja tiempo espera comida???? */
 	}
 	reset() {
 		/* se reinicia todo */
