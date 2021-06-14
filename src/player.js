@@ -6,26 +6,21 @@ class Player extends Entity {
 		this.position.y -= this.size.h / 2;
 
 		this.speed = speed;
-		this.blocked = false;
 
 		this.food = undefined;
 		this.nextToFood = false;
 	}
 
 	move(velX, velY) {
-		// Normalizamos:
-		let length = Math.sqrt(velX * velX + velY * velY);
+		if (this.position.x < 0) this.position.x = 0;
+		if (this.position.x + this.size.w > this.context.width) this.position.x = this.context.width;
+		if (this.position.x < 0) this.position.x = 0;
+		if (this.position.x < 0) this.position.x = 0;
 
-		if (length != 0) {
-			velX /= length;
-			velY /= length;
-		}
+		let vel = this.normalize(velX, velY);
 
-		velX *= this.speed;
-		velY *= this.speed;
-
-		this.position.x += velX;
-		this.position.y += velY;
+		this.position.x += vel.x;
+		this.position.y += vel.y;
 
 		//controlar colisiones con solidos
 	}
@@ -68,6 +63,20 @@ class Player extends Entity {
 		this.blocked = true;
 	}
 
+	normalize(velX, velY) {
+		let length = Math.sqrt(velX * velX + velY * velY);
+
+		if (length != 0) {
+			velX /= length;
+			velY /= length;
+		}
+
+		velX *= this.speed;
+		velY *= this.speed;
+
+		return { x: velX, y: velY };
+	}
+
 	draw() {
 		// this.context.fillStyle = 'lightblue';
 		// this.context.fillRect(this.position.x, this.position.y, this.size.w, this.size.h);
@@ -93,15 +102,15 @@ class Player extends Entity {
 
 	serveFood(obj = null) {
 		if (this.food !== undefined) {
-			console.log('Estoy tratando de dejar comida');
 			if (obj instanceof TrashCan) {
-				console.log('Estoy dejando comida en la papelera');
+				console.log('Estoy tirando la comida');
 				const newFood = this.food;
 				newFood.position = { x: this.position.x, y: this.position.y + 150 }; // tmp
 
 				this.food.disappear();
 				this.food = undefined;
 			} else {
+				console.log('entro aquí');
 				const newFood = this.food;
 				newFood.position = { x: this.position.x, y: this.position.y + 150 }; // tmp
 

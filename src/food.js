@@ -1,8 +1,7 @@
 class Food extends Entity {
 	constructor(context, positionX, positionY, width, height, imageUrl, typeOfFood) {
 		super(context, positionX, positionY, width, height, imageUrl);
-		this.position.x = positionX;
-		this.position.y = positionY;
+
 		this.typeOfFood = typeOfFood;
 
 		this.tmpSize = { w: width, h: height };
@@ -14,7 +13,7 @@ class Food extends Entity {
 		this.size = { w: 0, h: 0 };
 	}
 
-	draw() {
-		this.context.drawImage(this.image, this.position.x, this.position.y, this.size.w, this.size.h);
-	}
+	// draw() {
+	// 	this.context.drawImage(this.image, this.position.x, this.position.y, this.size.w, this.size.h);
+	// }
 }

@@ -19,6 +19,6 @@ class Entity {
 	}
 
 	draw() {
-		// considerar un draw genérico para todos los entities
+		this.context.drawImage(this.image, this.position.x - this.size.w / 2, this.position.y - this.size.h / 2, this.size.w, this.size.h);
 	}
 }
