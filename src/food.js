@@ -12,8 +12,4 @@ class Food extends Entity {
 		this.position = { x: 0, y: 0 };
 		this.size = { w: 0, h: 0 };
 	}
-
-	// draw() {
-	// 	this.context.drawImage(this.image, this.position.x, this.position.y, this.size.w, this.size.h);
-	// }
 }
