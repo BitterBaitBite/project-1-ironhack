@@ -13,6 +13,7 @@ const Game = {
 	resetButton: document.querySelector('button'),
 
 	background: undefined,
+	walls: undefined,
 	player: undefined,
 	interactMargin: 20,
 	trashCan: undefined,
@@ -21,7 +22,7 @@ const Game = {
 	clients: [],
 	finishedClients: 0, // clientes insatisfechos
 
-	typesOfFood: ['principal', 'segundo', 'postre'],
+	typesOfFood: ['curry', 'meat', 'dessert'],
 
 	keys: {
 		KeyW: 'w',
@@ -156,7 +157,7 @@ const Game = {
 			this.context.fillText(this.framesCounter + ' - ' + this.secondsCounter, 20, 40);
 			this.context.restore();
 
-			if (this.secondsCounter == this.GAME_OVER_TIMER || this.finishedClients >= 3) {
+			if (this.secondsCounter == this.GAME_OVER_TIMER || this.finishedClients >= 20) { /* cambiar */
 				this.clear();
 				if (this.finishedClients >= 3) this.gameOver.classList.add('lost');
 
@@ -185,6 +186,19 @@ const Game = {
 	createBackground() {
 		this.background = new Image();
 		this.background.src = 'img/tiles/floor.png';
+		this.walls = {
+			left: new Image(),
+			right: new Image(),
+			top: new Image(),
+			bottom: new Image(),
+		}
+
+		this.walls.left.src = 'img/tiles/barra-lat.png';
+		this.walls.right.src = 'img/tiles/barra-lat.png';
+		this.walls.top.src = 'img/tiles/barra-sup.png';
+		this.walls.bottom.src = 'img/tiles/barra-sup.png';
+
+
 	},
 
 	createPlayer() {
@@ -196,9 +210,9 @@ const Game = {
 	},
 
 	createKitchens() {
-		this.kitchens.push(new Kitchen(this.context, this.width - 200, this.height - 200, 180, 135, 'Tree.png', 'postre'));
-		this.kitchens.push(new Kitchen(this.context, this.width - 200, this.height - 400, 180, 135, 'Tree.png', 'segundo'));
-		this.kitchens.push(new Kitchen(this.context, this.width - 200, this.height - 600, 180, 135, 'Tree.png', 'principal'));
+		this.typesOfFood.forEach((el, i) => {
+			this.kitchens.push(new Kitchen(this.context, 32 + i % 2 * 32 * 8, Math.floor(i / 2) * this.canvas.height / 2, 256 / 2, 128 / 2, 'tiles/kitchen.png', el))
+		})
 	},
 
 	createCockroach() {
@@ -209,9 +223,10 @@ const Game = {
 	},
 
 	createClients() {
-		this.clients.push(new Client(this.context, 300 * this.clients.length + 100, 100, 102, 102, this.typesOfFood, 'Crate.png'));
-		this.clients.push(new Client(this.context, 300 * this.clients.length + 100, 100, 102, 102, this.typesOfFood, 'Crate.png'));
-		this.clients.push(new Client(this.context, 300 * this.clients.length + 100, 100, 102, 102, this.typesOfFood, 'Crate.png'));
+		this.clients.push(new Client(this.context, this.canvas.width / 2 + 32 * 2, 120, 32 * 2, 32 * 2, this.typesOfFood, 'tiles/table.png'));
+		this.clients.push(new Client(this.context, this.canvas.width / 2 + 32 * 2 + 32 * 4, 120, 32 * 2, 32 * 2, this.typesOfFood, 'tiles/table.png'));
+		this.clients.push(new Client(this.context, this.canvas.width / 2 + 32 * 2, 120 + 32 * 6, 32 * 2, 32 * 2, this.typesOfFood, 'tiles/table.png'));
+		this.clients.push(new Client(this.context, this.canvas.width / 2 + 32 * 2 + 32 * 4, 120 + 32 * 6, 32 * 2, 32 * 2, this.typesOfFood, 'tiles/table.png'));
 	},
 
 	// DRAW METHODS //
@@ -238,10 +253,19 @@ const Game = {
 		this.context.fillStyle = 'lightgrey';
 		this.context.fillRect(0, 0, this.width, this.height);
 		for (let i = 0; i < this.canvas.width / tileWidth; i++) {
+
+
 			for (let j = 0; j < this.canvas.height / tileWidth; j++) {
+
 				this.context.drawImage(this.background, i * tileWidth, j * tileWidth, tileWidth, tileWidth)
+				this.context.drawImage(this.walls.left, 0, j * tileWidth)
+				this.context.drawImage(this.walls.right, this.canvas.width - tileWidth / 2, j * tileWidth)
 
 			}
+			this.context.drawImage(this.walls.top, i * tileWidth, 0)
+			this.context.drawImage(this.walls.bottom, i * tileWidth, this.canvas.height - tileWidth / 2)
+
+
 		}
 
 
