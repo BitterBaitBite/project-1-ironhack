@@ -13,7 +13,7 @@ class Food extends Entity {
 		this.size = { w: 0, h: 0 };
 	}
 	draw() {
-		this.image.src = `img/tiles/dish-${this.typeOfFood}.png`
-		this.context.drawImage(this.image, this.position.x, this.position.y, this.size.w, this.size.h);
+		this.image.src = `img/tiles/dish-${this.typeOfFood}.png`;
+		this.context.drawImage(this.image, this.position.x + 10, this.position.y, this.size.w, this.size.h);
 	}
 }

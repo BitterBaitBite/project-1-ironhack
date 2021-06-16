@@ -9,8 +9,11 @@ class Client extends Entity {
 		this.pendingFood = false;
 		this.eating = false;
 		this.finished = false;
+		this.scored = false;
 
-		this.MAX_TIME = 10;
+		this.score = 0;
+
+		this.MAX_TIME = 15;
 
 		this.time = 0;
 	}
@@ -27,17 +30,18 @@ class Client extends Entity {
 
 		this.wantedFood = this.typesOfFood[random];
 
+		this.score += 30 * this.time;
+
 		this.time = 0;
 	}
 
 	receiveFood(food) {
-		console.log(food, ' - ', this.wantedFood);
-
 		let correctFood = food === this.wantedFood;
 
 		if (correctFood) {
 			this.pendingFood = false;
 			this.eating = true;
+			this.score += 30 * this.time;
 			this.time = 0;
 		}
 
@@ -45,11 +49,11 @@ class Client extends Entity {
 	}
 
 	update() {
-		if (!this.finished && !this.eating) {
-			if (this.pendingWaiter || this.pendingFood) this.time++;
-			console.log(this.time);
+		if (!this.finished) {
+			if (this.pendingWaiter || this.pendingFood || this.eating) this.time++;
 
 			if (this.time >= this.MAX_TIME) {
+				if (this.eating) this.score += 100;
 				this.pendingFood = false;
 				this.pendingWaiter = false;
 				this.eating = false;

@@ -3,9 +3,26 @@ class Player extends Entity {
 		super(context, positionX, positionY, width, height, imageUrl);
 
 		this.speed = speed;
+		this.runningImage = undefined;
+		this.faceTo = 3; // 0 - right | 1 - up | 2 - left | 3 - down
+		this.idle = true;
 
 		this.food = undefined;
 		this.nextToFood = false;
+
+		this.init();
+	}
+
+	init() {
+		this.image = new Image();
+		this.image.src = `img/anim/${this.imageUrl}`;
+		this.image.frames = 6;
+		this.image.framesIndex = 0;
+
+		this.runningImage = new Image();
+		this.runningImage.src = `img/anim/Adam_run.png`;
+		this.runningImage.frames = 4;
+		this.runningImage.framesIndex = 0;
 	}
 
 	move(velX, velY, trashCan, kitchens, clients) {
@@ -15,6 +32,9 @@ class Player extends Entity {
 			this.position.x += vel.x;
 			this.position.y += vel.y;
 		}
+
+		this.idle = false;
+		this.updateFaceTo(vel);
 	}
 
 	isCollision(trashCan, kitchens, clients, velX, velY) {
@@ -68,14 +88,59 @@ class Player extends Entity {
 		return { x: velX, y: velY };
 	}
 
-	draw() {
-		this.context.fillStyle = 'red';
-		this.context.fillRect(this.position.x, this.position.y, 100, 100);
+	// 0 - right | 1 - up | 2 - left | 3 - down
+	updateFaceTo(vel) {
+		if (vel.x > 0) this.faceTo = 0;
+		else if (vel.x < 0) this.faceTo = 2;
+		else if (vel.y < 0) this.faceTo = 1;
+		else if (vel.y > 0) this.faceTo = 3;
+		else this.idle = true;
+	}
 
-		// this.context.drawImage(this.image, this.position.x - this.size.w / 2, this.position.y, this.size.w + 80, this.size.h);
+	draw(framesCounter) {
+		// width = 1536 px
+		// fraction width = 384px
+		// frame width = 64px
+		if (this.idle) {
+			this.context.drawImage(
+				this.image,
+				this.faceTo * 384 + this.image.framesIndex * Math.floor(this.image.width / 4 / this.image.frames), //1152 - 1216 => 64px
+				0,
+				Math.floor(this.image.width / 4 / this.image.frames),
+				128,
+				this.position.x,
+				this.position.y - 36,
+				this.size.w,
+				this.size.h + 32
+			);
+		} else {
+			this.context.drawImage(
+				this.runningImage,
+				this.faceTo * 384 + this.image.framesIndex * Math.floor(this.image.width / 4 / this.image.frames), //1152 - 1216 => 64px
+				0,
+				Math.floor(this.image.width / 4 / this.image.frames),
+				128,
+				this.position.x,
+				this.position.y - 36,
+				this.size.w,
+				this.size.h + 32
+			);
+		}
+
 		if (this.food !== undefined) {
 			this.food.position = this.position;
 			this.food.draw();
+		}
+
+		this.animateSprite(framesCounter);
+	}
+
+	animateSprite(framesCounter) {
+		if (framesCounter % this.image.frames == 0) {
+			this.image.framesIndex++;
+		}
+		if (this.image.framesIndex >= this.image.frames) {
+			this.image.framesIndex = 0;
 		}
 	}
 

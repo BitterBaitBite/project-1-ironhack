@@ -20,7 +20,15 @@ const Game = {
 	kitchens: [],
 	cockroaches: [],
 	clients: [],
+	numberOfClients: 4,
 	finishedClients: 0, // clientes insatisfechos
+	cockroachTimer: 10,
+	totalScore: 0,
+
+	// alerts:
+	alertCall: undefined,
+	alertFood: undefined,
+	alertCockroachAlive: undefined,
 
 	typesOfFood: ['curry', 'meat', 'dessert'],
 
@@ -53,6 +61,12 @@ const Game = {
 		this.canvas = document.getElementById('myCanvas');
 		this.context = this.canvas.getContext('2d');
 		this.setDimensions();
+		this.alertCall = new Image();
+		this.alertCall.src = 'img/tiles/call-player-alert.png';
+		this.alertFood = new Image(); // se crea el src al alertar la comida, dependiendo de la comida deseada
+
+		this.alertCockroachAlive = new Image();
+		this.alertCockroachAlive.src = 'img/tiles/cockroach-alert.png';
 		this.start();
 	},
 
@@ -133,7 +147,7 @@ const Game = {
 			this.detectAllCollisions();
 			this.kitchens.forEach((el) => el.updateKitchen(this.framesCounter));
 
-			if (this.framesCounter % 60 === 0 && this.secondsCounter % 30 === 0) {
+			if (this.framesCounter % 60 === 0 && this.secondsCounter % this.cockroachTimer === 0) {
 				this.createCockroach();
 			}
 
@@ -151,13 +165,12 @@ const Game = {
 			this.alertClient();
 			this.alertWantedFood();
 
-			this.context.save();
 			this.context.fillStyle = 'white';
 			this.context.font = '30px Arial';
-			this.context.fillText(this.framesCounter + ' - ' + this.secondsCounter, 20, 40);
-			this.context.restore();
+			this.context.fillText(this.framesCounter + ' - ' + this.secondsCounter + ' - ' + this.totalScore, 20, 40);
 
-			if (this.secondsCounter == this.GAME_OVER_TIMER || this.finishedClients >= 20) { /* cambiar */
+			if (this.secondsCounter == this.GAME_OVER_TIMER || this.finishedClients >= 3) {
+				/* cambiar */
 				this.clear();
 				if (this.finishedClients >= 3) this.gameOver.classList.add('lost');
 
@@ -191,42 +204,63 @@ const Game = {
 			right: new Image(),
 			top: new Image(),
 			bottom: new Image(),
-		}
+		};
 
 		this.walls.left.src = 'img/tiles/barra-lat.png';
 		this.walls.right.src = 'img/tiles/barra-lat.png';
 		this.walls.top.src = 'img/tiles/barra-sup.png';
 		this.walls.bottom.src = 'img/tiles/barra-sup.png';
-
-
 	},
 
 	createPlayer() {
-		this.player = new Player(this.context, 210, this.height / 2, 100, 100, 10, 'Idle.png');
+		this.player = new Player(this.context, 210, this.height / 2, 64, 92, 10, 'Adam_idle.png');
 	},
 
 	createTrashCan() {
-		this.trashCan = new TrashCan(this.context, 120, this.height - 120, 100, 64, 'Bush.png'); // position temporal
+		this.trashCan = new TrashCan(this.context, 120, this.height - 120, 108 / 2, 108 / 2, 'tiles/trashcan.png'); // position temporal
 	},
 
 	createKitchens() {
 		this.typesOfFood.forEach((el, i) => {
-			this.kitchens.push(new Kitchen(this.context, 32 + i % 2 * 32 * 8, Math.floor(i / 2) * this.canvas.height / 2, 256 / 2, 128 / 2, 'tiles/kitchen.png', el))
-		})
+			this.kitchens.push(
+				new Kitchen(
+					this.context,
+					64 + (i % 2) * 64 * 4,
+					64 + (Math.floor(i / 2) * this.canvas.height) / this.typesOfFood.length,
+					256 / 1.8,
+					128 / 1.8,
+					'tiles/kitchen.png',
+					el
+				)
+			);
+		});
 	},
 
 	createCockroach() {
 		let randomX = Math.floor(Math.random() * this.width);
 		let randomY = Math.floor(Math.random() * this.height);
 
-		this.cockroaches.push(new Cockroach(this.context, randomX, randomY, 80, 60, 2, 'Dead.png'));
+		this.cockroaches.push(new Cockroach(this.context, randomX, randomY, 128 / 2, 128 / 2, 2, 'anim/BeetleMove.png'));
 	},
 
 	createClients() {
-		this.clients.push(new Client(this.context, this.canvas.width / 2 + 32 * 2, 120, 32 * 2, 32 * 2, this.typesOfFood, 'tiles/table.png'));
-		this.clients.push(new Client(this.context, this.canvas.width / 2 + 32 * 2 + 32 * 4, 120, 32 * 2, 32 * 2, this.typesOfFood, 'tiles/table.png'));
-		this.clients.push(new Client(this.context, this.canvas.width / 2 + 32 * 2, 120 + 32 * 6, 32 * 2, 32 * 2, this.typesOfFood, 'tiles/table.png'));
-		this.clients.push(new Client(this.context, this.canvas.width / 2 + 32 * 2 + 32 * 4, 120 + 32 * 6, 32 * 2, 32 * 2, this.typesOfFood, 'tiles/table.png'));
+		for (let i = 0; i < this.numberOfClients; i++) {
+			this.clients.push(
+				new Client(
+					this.context,
+					this.canvas.width / 2 + 64 * 2 + (i % 2) * 64 * 4,
+					200 + Math.floor(i / 2) * (this.canvas.height - 220 - 64 * 3),
+					64 * 1.2,
+					64 * 1.2,
+					this.typesOfFood,
+					'tiles/table.png'
+				)
+			);
+		}
+
+		// this.clients.push(new Client(this.context, this.canvas.width / 2 + 64, 120, 64, 64, this.typesOfFood, 'tiles/table.png'));
+		// this.clients.push(new Client(this.context, this.canvas.width / 2 + 64 + 32 * 4, 120, 64, 64, this.typesOfFood, 'tiles/table.png'));
+		// this.clients.push(new Client(this.context, this.canvas.width / 2 + 64, 120 + 32 * 6, 64, 64, this.typesOfFood, 'tiles/table.png'));
 	},
 
 	// DRAW METHODS //
@@ -238,51 +272,31 @@ const Game = {
 	drawAll() {
 		this.drawBackground();
 
-		this.cockroaches.forEach((el) => el.draw());
+		this.cockroaches.forEach((el) => el.draw(this.framesCounter));
 
 		this.trashCan.draw();
 		this.kitchens.forEach((el) => el.draw());
 		this.clients.forEach((el) => el.draw());
 
-		this.player.draw();
+		this.player.draw(this.framesCounter);
 	},
 
 	drawBackground() {
 		// this.context.restore();
-		const tileWidth = 32 * 2
+		const tileWidth = 32 * 2;
 		this.context.fillStyle = 'lightgrey';
 		this.context.fillRect(0, 0, this.width, this.height);
 		for (let i = 0; i < this.canvas.width / tileWidth; i++) {
-
-
 			for (let j = 0; j < this.canvas.height / tileWidth; j++) {
-
-				this.context.drawImage(this.background, i * tileWidth, j * tileWidth, tileWidth, tileWidth)
-				this.context.drawImage(this.walls.left, 0, j * tileWidth)
-				this.context.drawImage(this.walls.right, this.canvas.width - tileWidth / 2, j * tileWidth)
-
+				this.context.drawImage(this.background, i * tileWidth, j * tileWidth, tileWidth, tileWidth);
+				this.context.drawImage(this.walls.left, 0 - tileWidth, j * tileWidth);
+				this.context.drawImage(this.walls.right, this.canvas.width - tileWidth / 2, j * tileWidth);
 			}
-			this.context.drawImage(this.walls.top, i * tileWidth, 0)
-			this.context.drawImage(this.walls.bottom, i * tileWidth, this.canvas.height - tileWidth / 2)
-
-
+			this.context.drawImage(this.walls.top, i * tileWidth - tileWidth, 0 - tileWidth);
+			this.context.drawImage(this.walls.bottom, i * tileWidth, this.canvas.height - tileWidth / 2);
 		}
-
 
 		// this.context.save();
-	},
-
-	alertCockroach() {
-		if (this.cockroaches.length > 0) {
-			this.context.fillStyle = 'red';
-
-			this.context.beginPath();
-			this.context.arc(this.player.position.x + 90, this.player.position.y + 80, 12, 0, Math.PI * 2);
-			this.context.fill();
-			this.context.closePath();
-
-			this.context.fillRect(this.player.position.x + 80, this.player.position.y, 20, 60);
-		}
 	},
 
 	callPlayer() {
@@ -293,26 +307,42 @@ const Game = {
 		}
 	},
 
+	alertCockroach() {
+		if (this.cockroaches.length > 0) {
+			this.context.drawImage(
+				this.alertCockroachAlive,
+				this.player.position.x + this.player.size.w / 2 - 400 / 12,
+				this.player.position.y + this.player.size.h / 2 - 297 / 4,
+				400 / 6,
+				297 / 6
+			);
+		}
+	},
+
 	alertClient() {
 		this.clients.forEach((el) => {
 			if (el.pendingWaiter && !el.pendingFood && !el.finished) {
-				this.context.fillStyle = 'red';
-
-				this.context.beginPath();
-				this.context.arc(el.position.x + 70, el.position.y + 50, 12, 0, Math.PI * 2);
-				this.context.fill();
-				this.context.closePath();
-
-				this.context.fillRect(el.position.x + 60, el.position.y - 30, 20, 60);
+				this.context.drawImage(
+					this.alertCall,
+					el.position.x + el.size.w / 2 - 400 / 16,
+					el.position.y - el.size.h / 2 - 8,
+					400 / 8,
+					297 / 8
+				);
 			}
 
 			if (el.finished) {
 				this.context.fillStyle = 'red';
 
 				this.context.beginPath();
-				this.context.arc(el.position.x, el.position.y, el.size.w / 2, 0, Math.PI * 2);
+				this.context.arc(el.position.x + el.size.w / 2, el.position.y + el.size.h / 2, el.size.w / 4, 0, Math.PI * 2);
 				this.context.fill();
 				this.context.closePath();
+
+				if (!el.scored) {
+					this.totalScore += el.score;
+					el.scored = true;
+				}
 			}
 		});
 	},
@@ -320,8 +350,14 @@ const Game = {
 	alertWantedFood() {
 		this.clients.forEach((el) => {
 			if (!el.pendingWaiter && el.pendingFood) {
-				this.context.fillStyle = 'blue';
-				this.context.fillRect(el.position.x + 60, el.position.y - 30, 40, 40);
+				this.alertFood.src = `img/tiles/dish-${el.wantedFood}-alert.png`;
+				this.context.drawImage(
+					this.alertFood,
+					el.position.x + el.size.w / 2 - 400 / 16,
+					el.position.y - el.size.h / 2 - 10,
+					400 / 8,
+					312 / 8
+				);
 			}
 		});
 	},
@@ -347,11 +383,11 @@ const Game = {
 	},
 
 	solidCanvasCollision(obj) {
-		if (obj.position.x < 0) obj.position.x = 0;
-		else if (obj.position.x + obj.size.w > this.width) obj.position.x = this.width - obj.size.w;
+		if (obj.position.x < 0 + 64) obj.position.x = 64;
+		else if (obj.position.x + obj.size.w > this.width - 32) obj.position.x = this.width - obj.size.w - 32;
 
 		if (obj.position.y < 0) obj.position.y = 0;
-		else if (obj.position.y + obj.size.h > this.height) obj.position.y = this.height - obj.size.h;
+		else if (obj.position.y + obj.size.h > this.height - 32) obj.position.y = this.height - obj.size.h - 32;
 	},
 
 	calculateMovement() {
@@ -418,11 +454,11 @@ const Game = {
 
 	collisionClient(client) {
 		if (this.isCollision(client, this.player) && !client.finished) {
-			if (this.keyEDown && this.clients.length > 0 && client.pendingWaiter && !client.pendingFood) {
+			if (this.keyEDown && this.clients.length > 0 && client.pendingWaiter && !client.pendingFood && this.cockroaches.length <= 0) {
 				client.receivePlayer(this.framesCounter);
 			}
 
-			if (this.keyFDown && this.clients.length > 0 && !client.pendingWaiter && client.pendingFood) {
+			if (this.keyFDown && this.clients.length > 0 && !client.pendingWaiter && client.pendingFood && this.cockroaches.length <= 0) {
 				console.log('Intentando servir comida');
 
 				if (this.player.food != undefined && client.receiveFood(this.player.food.typeOfFood)) {
