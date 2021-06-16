@@ -184,7 +184,7 @@ const Game = {
 
 	createBackground() {
 		this.background = new Image();
-		this.background.src = 'img/Crate.png';
+		this.background.src = 'img/tiles/floor.png';
 	},
 
 	createPlayer() {
@@ -234,8 +234,17 @@ const Game = {
 
 	drawBackground() {
 		// this.context.restore();
+		const tileWidth = 32 * 2
 		this.context.fillStyle = 'lightgrey';
 		this.context.fillRect(0, 0, this.width, this.height);
+		for (let i = 0; i < this.canvas.width / tileWidth; i++) {
+			for (let j = 0; j < this.canvas.height / tileWidth; j++) {
+				this.context.drawImage(this.background, i * tileWidth, j * tileWidth, tileWidth, tileWidth)
+
+			}
+		}
+
+
 		// this.context.save();
 	},
 
