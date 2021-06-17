@@ -104,7 +104,7 @@ class Player extends Entity {
 		if (this.idle) {
 			this.context.drawImage(
 				this.image,
-				this.faceTo * 384 + this.image.framesIndex * Math.floor(this.image.width / 4 / this.image.frames), //1152 - 1216 => 64px
+				this.faceTo * 384 + this.image.framesIndex * Math.floor(this.image.width / 4 / this.image.frames),
 				0,
 				Math.floor(this.image.width / 4 / this.image.frames),
 				128,
@@ -116,7 +116,7 @@ class Player extends Entity {
 		} else {
 			this.context.drawImage(
 				this.runningImage,
-				this.faceTo * 384 + this.image.framesIndex * Math.floor(this.image.width / 4 / this.image.frames), //1152 - 1216 => 64px
+				this.faceTo * 384 + this.image.framesIndex * Math.floor(this.image.width / 4 / this.image.frames),
 				0,
 				Math.floor(this.image.width / 4 / this.image.frames),
 				128,
@@ -153,13 +153,9 @@ class Player extends Entity {
 	serveFood(obj = null) {
 		if (this.food !== undefined) {
 			if (obj instanceof TrashCan) {
-				console.log('Estoy tirando la comida');
-
 				this.food.disappear();
 				this.food = undefined;
 			} else if (obj instanceof Client) {
-				console.log('Sirvo comida');
-
 				this.food.disappear();
 				this.food = undefined;
 			}

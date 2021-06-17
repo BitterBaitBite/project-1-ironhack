@@ -1,6 +1,7 @@
 const Game = {
 	// PROPERTIES //
 
+	// Global game properties
 	canvas: undefined,
 	context: undefined,
 	width: undefined,
@@ -8,29 +9,51 @@ const Game = {
 	FPS: 60,
 	framesCounter: 0,
 	secondsCounter: 0,
-	GAME_OVER_TIMER: 60,
-	gameOver: document.getElementById('game-over-container'),
-	resetButton: document.querySelector('button'),
 
+	// DOM properties
+	gameOver: document.getElementById('game-over-container'),
+	resetButton: document.querySelector('.replay'),
+	scoreElement: document.querySelector('.score'),
+	insectElement: document.querySelector('.insect'),
+	satisfiedElement: document.querySelector('.satisfied'),
+	trashElement: document.querySelector('.trash'),
+
+	// Audio properties
+	musicController: document.getElementById('musicAudio'),
+	backgroundAudio: document.getElementById('backgroundAudio'),
+	kitchenAudio: document.getElementById('kitchenAudio'),
+	cockroachAudio: document.getElementById('cockroachAudio'),
+	trashAudio: document.getElementById('trashAudio'),
+	clientAudio: document.getElementById('clientAudio'),
+
+	// Drawing properties
 	background: undefined,
 	walls: undefined,
 	player: undefined,
 	interactMargin: 20,
 	trashCan: undefined,
+
+	// Game logic properties
 	kitchens: [],
 	cockroaches: [],
 	clients: [],
+	typesOfFood: ['curry', 'meat', 'dessert'],
 	numberOfClients: 4,
-	finishedClients: 0, // clientes insatisfechos
 	cockroachTimer: 10,
-	totalScore: 0,
 
-	// alerts:
+	finishedClients: 0, // clientes insatisfechos
+	totalScore: 0,
+	insectScore: 0,
+	satisfiedScore: 0,
+	trashScore: 0,
+	GAME_OVER_TIMER: 120,
+
+	// Alert properties
 	alertCall: undefined,
 	alertFood: undefined,
 	alertCockroachAlive: undefined,
-
-	typesOfFood: ['curry', 'meat', 'dessert'],
+	alertAngry: undefined,
+	alertSatisfied: undefined,
 
 	keys: {
 		KeyW: 'w',
@@ -40,8 +63,6 @@ const Game = {
 		KeyE: 'e',
 		KeyF: 'f',
 		SPACE: ' ',
-		KeyR: 'r',
-		KeyG: 'g',
 	},
 
 	keyWDown: false,
@@ -50,7 +71,6 @@ const Game = {
 	keyDDown: false,
 	keyEDown: false,
 	keyFDown: false,
-	keyGDown: false,
 	SPACEDown: false,
 
 	pressed: false,
@@ -64,9 +84,17 @@ const Game = {
 		this.alertCall = new Image();
 		this.alertCall.src = 'img/tiles/call-player-alert.png';
 		this.alertFood = new Image(); // se crea el src al alertar la comida, dependiendo de la comida deseada
-
 		this.alertCockroachAlive = new Image();
 		this.alertCockroachAlive.src = 'img/tiles/cockroach-alert.png';
+
+		this.alertAngry = new Image();
+		this.alertAngry.src = 'img/tiles/angry-alert.png';
+		this.alertSatisfied = new Image();
+		this.alertSatisfied.src = 'img/tiles/satisfied-client-alert.png';
+
+		this.musicController.volume = 0.2;
+		this.backgroundAudio.volume = 0.4;
+
 		this.start();
 	},
 
@@ -88,8 +116,12 @@ const Game = {
 				this.keyEDown = true;
 				this.pressed = true;
 			}
-			e.key.toLowerCase() === this.keys.KeyF ? (this.keyFDown = true) : null;
-			e.key.toLowerCase() === this.keys.KeyG ? (this.keyGDown = true) : null;
+
+			if (e.key.toLowerCase() === this.keys.KeyF && !this.pressed) {
+				this.keyFDown = true;
+				this.pressed = true;
+			}
+
 			e.key.toLowerCase() === this.keys.SPACE ? (this.SPACEDown = true) : null;
 		};
 
@@ -103,14 +135,17 @@ const Game = {
 				this.keyEDown = false;
 				this.pressed = false;
 			}
-			e.key.toLowerCase() === this.keys.KeyF ? (this.keyFDown = false) : null;
-			e.key.toLowerCase() === this.keys.KeyG ? (this.keyGDown = false) : null;
+			if (e.key.toLowerCase() === this.keys.KeyF) {
+				this.keyFDown = false;
+				this.pressed = false;
+			}
+
 			e.key.toLowerCase() === this.keys.SPACE ? (this.SPACEDown = false) : null;
 		};
 
 		this.resetButton.onclick = (e) => {
-			console.log('Click en botón');
 			this.gameOver.classList.add('hidden');
+
 			this.init();
 		};
 	},
@@ -127,12 +162,22 @@ const Game = {
 		this.kitchens = new Array();
 		this.cockroaches = new Array();
 		this.clients = new Array();
+
 		this.finishedClients = 0;
+
+		this.insectScore = 0;
+		this.trashScore = 0;
+		this.satisfiedScore = 0;
+		this.totalScore = 0;
+
+		this.canvas.classList.remove('hidden');
 	},
 
 	start() {
 		this.reset();
 		this.setEventListeners();
+		this.musicController.play();
+		this.backgroundAudio.play();
 		this.createAll();
 		this.drawAll();
 
@@ -167,7 +212,11 @@ const Game = {
 
 			this.context.fillStyle = 'white';
 			this.context.font = '30px Arial';
-			this.context.fillText(this.framesCounter + ' - ' + this.secondsCounter + ' - ' + this.totalScore, 20, 40);
+			this.context.fillText(
+				/* this.framesCounter + ' - ' +  */ this.secondsCounter /*  + ' - ' + this.totalScore */ + ' - ' + this.satisfiedScore,
+				20,
+				40
+			);
 
 			if (this.secondsCounter == this.GAME_OVER_TIMER || this.finishedClients >= 3) {
 				/* cambiar */
@@ -175,6 +224,12 @@ const Game = {
 				if (this.finishedClients >= 3) this.gameOver.classList.add('lost');
 
 				this.gameOver.classList.remove('hidden');
+				this.canvas.classList.add('hidden');
+
+				this.scoreElement.textContent = Math.floor(this.totalScore);
+				this.insectElement.textContent = this.insectScore;
+				this.satisfiedElement.textContent = this.satisfiedScore;
+				this.trashElement.textContent = this.trashScore;
 
 				clearInterval(this.interval);
 			}
@@ -193,7 +248,7 @@ const Game = {
 		this.createTrashCan();
 		this.createKitchens();
 
-		this.createClients(); // temp
+		this.createClients();
 	},
 
 	createBackground() {
@@ -217,7 +272,7 @@ const Game = {
 	},
 
 	createTrashCan() {
-		this.trashCan = new TrashCan(this.context, 120, this.height - 120, 108 / 2, 108 / 2, 'tiles/trashcan.png'); // position temporal
+		this.trashCan = new TrashCan(this.context, 120, this.height - 120, 108 / 2, 108 / 2, 'tiles/trashcan.png');
 	},
 
 	createKitchens() {
@@ -225,6 +280,7 @@ const Game = {
 			this.kitchens.push(
 				new Kitchen(
 					this.context,
+					this.kitchenAudio,
 					64 + (i % 2) * 64 * 4,
 					64 + (Math.floor(i / 2) * this.canvas.height) / this.typesOfFood.length,
 					256 / 1.8,
@@ -238,7 +294,7 @@ const Game = {
 
 	createCockroach() {
 		let randomX = Math.floor(Math.random() * this.width);
-		let randomY = Math.floor(Math.random() * this.height);
+		let randomY = Math.floor(Math.random() * (this.height - 64) + 64);
 
 		this.cockroaches.push(new Cockroach(this.context, randomX, randomY, 128 / 2, 128 / 2, 2, 'anim/BeetleMove.png'));
 	},
@@ -248,8 +304,10 @@ const Game = {
 			this.clients.push(
 				new Client(
 					this.context,
+					this.clientAudio,
 					this.canvas.width / 2 + 64 * 2 + (i % 2) * 64 * 4,
-					200 + Math.floor(i / 2) * (this.canvas.height - 220 - 64 * 3),
+					this.canvas.height / this.numberOfClients +
+						Math.floor(i / 2) * (this.canvas.height - this.canvas.height / this.numberOfClients - 64 * this.numberOfClients),
 					64 * 1.2,
 					64 * 1.2,
 					this.typesOfFood,
@@ -257,10 +315,6 @@ const Game = {
 				)
 			);
 		}
-
-		// this.clients.push(new Client(this.context, this.canvas.width / 2 + 64, 120, 64, 64, this.typesOfFood, 'tiles/table.png'));
-		// this.clients.push(new Client(this.context, this.canvas.width / 2 + 64 + 32 * 4, 120, 64, 64, this.typesOfFood, 'tiles/table.png'));
-		// this.clients.push(new Client(this.context, this.canvas.width / 2 + 64, 120 + 32 * 6, 64, 64, this.typesOfFood, 'tiles/table.png'));
 	},
 
 	// DRAW METHODS //
@@ -282,7 +336,6 @@ const Game = {
 	},
 
 	drawBackground() {
-		// this.context.restore();
 		const tileWidth = 32 * 2;
 		this.context.fillStyle = 'lightgrey';
 		this.context.fillRect(0, 0, this.width, this.height);
@@ -295,14 +348,11 @@ const Game = {
 			this.context.drawImage(this.walls.top, i * tileWidth - tileWidth, 0 - tileWidth);
 			this.context.drawImage(this.walls.bottom, i * tileWidth, this.canvas.height - tileWidth / 2);
 		}
-
-		// this.context.save();
 	},
 
 	callPlayer() {
 		if (this.framesCounter % 60 === 0 && this.secondsCounter % 5 === 0) {
 			let randomIndex = Math.floor(Math.random() * this.clients.length);
-			console.log('Intentando llamar a la mesa', randomIndex);
 			this.clients[randomIndex].callPlayer();
 		}
 	},
@@ -332,17 +382,28 @@ const Game = {
 			}
 
 			if (el.finished) {
-				this.context.fillStyle = 'red';
-
-				this.context.beginPath();
-				this.context.arc(el.position.x + el.size.w / 2, el.position.y + el.size.h / 2, el.size.w / 4, 0, Math.PI * 2);
-				this.context.fill();
-				this.context.closePath();
-
 				if (!el.scored) {
 					this.totalScore += el.score;
+					if (el.satisfied) this.satisfiedScore++;
 					el.scored = true;
 				}
+
+				if (el.satisfied) {
+					this.context.drawImage(
+						this.alertSatisfied,
+						el.position.x + el.size.w / 2 - 400 / 16,
+						el.position.y - el.size.h / 2 - 10,
+						400 / 8,
+						312 / 8
+					);
+				} else
+					this.context.drawImage(
+						this.alertAngry,
+						el.position.x + el.size.w / 2 - 400 / 16,
+						el.position.y - el.size.h / 2 - 10,
+						400 / 8,
+						312 / 8
+					);
 			}
 		});
 	},
@@ -386,12 +447,11 @@ const Game = {
 		if (obj.position.x < 0 + 64) obj.position.x = 64;
 		else if (obj.position.x + obj.size.w > this.width - 32) obj.position.x = this.width - obj.size.w - 32;
 
-		if (obj.position.y < 0) obj.position.y = 0;
+		if (obj.position.y < 0 + 32) obj.position.y = 0 + 32;
 		else if (obj.position.y + obj.size.h > this.height - 32) obj.position.y = this.height - obj.size.h - 32;
 	},
 
 	calculateMovement() {
-		// (x, y) -> (x+x2, y+y2)
 		let velX = 0;
 		let velY = 0;
 
@@ -423,8 +483,11 @@ const Game = {
 
 	collisionTrashCan() {
 		if (this.isCollision(this.trashCan, this.player)) {
-			if (this.keyFDown && this.cockroaches.length <= 0) {
+			if (this.keyFDown && this.cockroaches.length <= 0 && this.pressed) {
 				this.player.serveFood(this.trashCan);
+				this.keyFDown = false;
+				this.trashScore++;
+				this.playTrashCan();
 			}
 		}
 	},
@@ -446,8 +509,9 @@ const Game = {
 	collisionCockroach(cockroach, index) {
 		if (this.isCollision(cockroach, this.player)) {
 			if (this.SPACEDown) {
-				console.log('Pisando a la cucaracha');
 				this.cockroaches.splice(index, 1);
+				this.insectScore++;
+				this.playCockroachDeath();
 			}
 		}
 	},
@@ -459,12 +523,20 @@ const Game = {
 			}
 
 			if (this.keyFDown && this.clients.length > 0 && !client.pendingWaiter && client.pendingFood && this.cockroaches.length <= 0) {
-				console.log('Intentando servir comida');
-
 				if (this.player.food != undefined && client.receiveFood(this.player.food.typeOfFood)) {
 					this.player.serveFood(client);
 				}
 			}
 		}
+	},
+
+	// AUDIO AND SOUND EFFECTS //
+
+	playCockroachDeath() {
+		this.cockroachAudio.play();
+	},
+
+	playTrashCan() {
+		this.trashAudio.play();
 	},
 };

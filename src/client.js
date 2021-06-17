@@ -1,5 +1,5 @@
 class Client extends Entity {
-	constructor(context, positionX, positionY, width, height, typesOfFood, imageUrl) {
+	constructor(context, audio, positionX, positionY, width, height, typesOfFood, imageUrl) {
 		super(context, positionX, positionY, width, height, imageUrl);
 
 		this.typesOfFood = typesOfFood;
@@ -10,6 +10,9 @@ class Client extends Entity {
 		this.eating = false;
 		this.finished = false;
 		this.scored = false;
+		this.satisfied = false;
+
+		this.audio = audio;
 
 		this.score = 0;
 
@@ -19,7 +22,10 @@ class Client extends Entity {
 	}
 
 	callPlayer() {
-		if (!this.pendingWaiter && !this.pendingFood && !this.eating) this.pendingWaiter = true;
+		if (!this.pendingWaiter && !this.pendingFood && !this.eating) {
+			this.pendingWaiter = true;
+			this.audio.play();
+		}
 	}
 
 	receivePlayer() {
@@ -30,7 +36,7 @@ class Client extends Entity {
 
 		this.wantedFood = this.typesOfFood[random];
 
-		this.score += 30 * this.time;
+		this.score += 300 / this.time;
 
 		this.time = 0;
 	}
@@ -41,7 +47,7 @@ class Client extends Entity {
 		if (correctFood) {
 			this.pendingFood = false;
 			this.eating = true;
-			this.score += 30 * this.time;
+			this.score += 300 / this.time;
 			this.time = 0;
 		}
 
@@ -53,14 +59,22 @@ class Client extends Entity {
 			if (this.pendingWaiter || this.pendingFood || this.eating) this.time++;
 
 			if (this.time >= this.MAX_TIME) {
-				if (this.eating) this.score += 100;
+				if (this.eating) {
+					this.score += 100;
+					this.satisfied = true;
+					this.eating = false;
+				}
 				this.pendingFood = false;
 				this.pendingWaiter = false;
-				this.eating = false;
 				this.finished = true;
+				this.audio.play();
 				return true;
 			}
 		}
 		return false;
+	}
+
+	draw() {
+		this.context.drawImage(this.image, this.position.x, this.position.y, this.size.w, this.size.h);
 	}
 }

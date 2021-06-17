@@ -1,5 +1,3 @@
-//Collider (solid)
-
 class Entity {
 	constructor(context, positionX, positionY, width, height, imageUrl) {
 		this.context = context;

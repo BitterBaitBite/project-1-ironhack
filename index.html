@@ -7,16 +7,82 @@
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Document</title>
       <link rel="stylesheet" href="./styles/style.css">
+      <link rel="shortcut icon" href="">
 </head>
 
 <body>
-      <div id="game-over-container" class='hidden'>
-            <div class="game-over-alert">
-                  <p>GAME OVER</p>
-                  <button>Volver a jugar</button>
+      <div id="init-container">
+            <h1>Pesadilla en la cocina</h1>
+            <hr>
+            <div class="init-window">
+                  <div class="game-explanation">
+                        <p>
+                              Tu propósito en el juego es atender a los <span>clientes</span>,
+                              <span>cocinar</span> y <span>servirles</span> la comida que deseen.
+                        </p>
+
+                        <p>
+                              Si <span class="maxUnsatisfied"></span> clientes quedan insatisfechos,
+                              ya sea porque no les atiendes, como porque no les sirves la comida deseada
+                              a tiempo, la partida acabará prematuramente.
+                        </p>
+
+                        <p>
+                              Si en cambio aguantas <span class="maxTime"></span> segundos, tendrás más
+                              oportunidades de conseguir una mayor puntuación
+                        </p>
+                  </div>
+
+                  <div class="game-instructions">
+                        <div class="movement">
+                              <p> Movimiento </p>
+                              <div class="images">
+                                    <img src="img\keys\W1.png" alt="w key" class="w-key">
+                                    <img src="img\keys\A1.png" alt="a key">
+                                    <img src="img\keys\S1.png" alt="s key">
+                                    <img src="img\keys\D1.png" alt="d key">
+                              </div>
+                        </div>
+
+                        <div class="interact">
+                              <p> Interactuar con las cocinas o los clientes </p>
+                              <img src="img\keys\E1.png" alt="e key">
+                        </div>
+
+                        <div class="food-interact">
+                              <p> Coger y dejar comida </p>
+                              <img src="img\keys\F13.png" alt="f key">
+                        </div>
+
+                        <div class="insect-interact">
+                              <p> Matar cucaracha </p>
+                              <img src="img\keys\Space1.png" alt="w key">
+                        </div>
+                  </div>
+                  <button class="play">Jugar</button>
             </div>
       </div>
-      <canvas id="myCanvas"></canvas>
+
+      <div id="game-over-container" class='hidden'>
+            <h2>Game over</h2>
+            <hr>
+            <div class="game-over-alert">
+                  <h3 id="totalScore">Tu puntuación total es de: <span class="score"></span></h3>
+                  <p>Has matado <span class="insect"></span> cucarachas</p>
+                  <p>Has hecho felices a <span class="satisfied"></span> clientes</p>
+                  <p>Has tirado <span class="trash"></span> comida(s) a la basura</p>
+                  <button class="replay">Volver a jugar</button>
+            </div>
+      </div>
+
+      <audio id="musicAudio" src="sounds\bensound-memories.mp3" class="hidden"></audio>
+      <audio id="backgroundAudio" src="sounds\crowd-talking-5.mp3" class="hidden"></audio>
+      <audio id="kitchenAudio" src="" class="hidden"></audio>
+      <audio id="cockroachAudio" src="sounds/pop.mp3" class="hidden"></audio>
+      <audio id="trashAudio" src="sounds/sound28.mp3" class="hidden"></audio>
+      <audio id="clientAudio" src="sounds/sound26.mp3" class="hidden"></audio>
+
+      <canvas id="myCanvas" class="hidden"></canvas>
 
 
       <script src="./src/entity.js"></script>

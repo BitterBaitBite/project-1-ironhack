@@ -1,5 +1,5 @@
 class Kitchen extends Entity {
-	constructor(context, positionX, positionY, width, height, imageUrl, typeOfFood) {
+	constructor(context, audio, positionX, positionY, width, height, imageUrl, typeOfFood) {
 		super(context, positionX, positionY, width, height, imageUrl);
 
 		this.food = undefined;
@@ -13,6 +13,9 @@ class Kitchen extends Entity {
 		this.currentInteractions = 0;
 		this.MAX_FOOD = 1;
 		this.MAX_INTERACTIONS = 1;
+
+		this.audio = audio;
+
 		this.init();
 	}
 	init() {
@@ -28,10 +31,12 @@ class Kitchen extends Entity {
 
 	startCooking(noFoodInGame) {
 		if (this.currentInteractions < this.MAX_INTERACTIONS && noFoodInGame && this.food == undefined) {
-			console.log('Cocinando');
 			this.cooking = true;
 			this.time = 0;
 			this.currentInteractions++;
+
+			this.audio.src = 'sounds/sizzling-frying-pan-1.mp3';
+			this.audio.play();
 		}
 	}
 
@@ -50,6 +55,10 @@ class Kitchen extends Entity {
 			);
 			this.currentInteractions--;
 			this.cooking = false;
+
+			this.audio.pause();
+			this.audio.src = 'sounds/sound13.mp3';
+			this.audio.play();
 		}
 	}
 
