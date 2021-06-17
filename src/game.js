@@ -311,7 +311,7 @@ const Game = {
 					64 * 1.2,
 					64 * 1.2,
 					this.typesOfFood,
-					'tiles/table.png'
+					'tiles/table2.png'
 				)
 			);
 		}
@@ -330,7 +330,7 @@ const Game = {
 
 		this.trashCan.draw();
 		this.kitchens.forEach((el) => el.draw());
-		this.clients.forEach((el) => el.draw());
+		this.clients.forEach((el) => el.draw(this.framesCounter));
 
 		this.player.draw(this.framesCounter);
 	},
@@ -372,13 +372,7 @@ const Game = {
 	alertClient() {
 		this.clients.forEach((el) => {
 			if (el.pendingWaiter && !el.pendingFood && !el.finished) {
-				this.context.drawImage(
-					this.alertCall,
-					el.position.x + el.size.w / 2 - 400 / 16,
-					el.position.y - el.size.h / 2 - 8,
-					400 / 8,
-					297 / 8
-				);
+				this.context.drawImage(this.alertCall, el.position.x + el.size.w + 12, el.position.y - el.size.h / 2 - 12, 400 / 8, 297 / 8);
 			}
 
 			if (el.finished) {
@@ -391,19 +385,13 @@ const Game = {
 				if (el.satisfied) {
 					this.context.drawImage(
 						this.alertSatisfied,
-						el.position.x + el.size.w / 2 - 400 / 16,
-						el.position.y - el.size.h / 2 - 10,
+						el.position.x + el.size.w + 12,
+						el.position.y - el.size.h / 2 - 14,
 						400 / 8,
 						312 / 8
 					);
 				} else
-					this.context.drawImage(
-						this.alertAngry,
-						el.position.x + el.size.w / 2 - 400 / 16,
-						el.position.y - el.size.h / 2 - 10,
-						400 / 8,
-						312 / 8
-					);
+					this.context.drawImage(this.alertAngry, el.position.x + el.size.w + 12, el.position.y - el.size.h / 2 - 14, 400 / 8, 312 / 8);
 			}
 		});
 	},
@@ -412,13 +400,7 @@ const Game = {
 		this.clients.forEach((el) => {
 			if (!el.pendingWaiter && el.pendingFood) {
 				this.alertFood.src = `img/tiles/dish-${el.wantedFood}-alert.png`;
-				this.context.drawImage(
-					this.alertFood,
-					el.position.x + el.size.w / 2 - 400 / 16,
-					el.position.y - el.size.h / 2 - 10,
-					400 / 8,
-					312 / 8
-				);
+				this.context.drawImage(this.alertFood, el.position.x + el.size.w + 12, el.position.y - el.size.h / 2 - 14, 400 / 8, 312 / 8);
 			}
 		});
 	},
@@ -447,7 +429,7 @@ const Game = {
 		if (obj.position.x < 0 + 64) obj.position.x = 64;
 		else if (obj.position.x + obj.size.w > this.width - 32) obj.position.x = this.width - obj.size.w - 32;
 
-		if (obj.position.y < 0 + 32) obj.position.y = 0 + 32;
+		if (obj.position.y < 0 + 64) obj.position.y = 0 + 64;
 		else if (obj.position.y + obj.size.h > this.height - 32) obj.position.y = this.height - obj.size.h - 32;
 	},
 
