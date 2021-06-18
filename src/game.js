@@ -273,12 +273,22 @@ const Game = {
 			right: new Image(),
 			top: new Image(),
 			bottom: new Image(),
+
+			topLeftCorner: new Image(),
+			topRightCorner: new Image(),
+			bottomLeftCorner: new Image(),
+			bottomRightCorner: new Image(),
 		};
 
-		this.walls.left.src = 'img/tiles/barra-lat.png';
-		this.walls.right.src = 'img/tiles/barra-lat.png';
-		this.walls.top.src = 'img/tiles/barra-sup.png';
-		this.walls.bottom.src = 'img/tiles/barra-sup.png';
+		this.walls.left.src = 'img/tiles/left-wall.png';
+		this.walls.right.src = 'img/tiles/right-wall.png';
+		this.walls.top.src = 'img/tiles/top-wall.png';
+		this.walls.bottom.src = 'img/tiles/bottom-wall.png';
+
+		this.walls.topLeftCorner.src = 'img/tiles/top-left-corner.png';
+		this.walls.topRightCorner.src = 'img/tiles/top-right-corner.png';
+		this.walls.bottomLeftCorner.src = 'img/tiles/bottom-left-corner.png';
+		this.walls.bottomRightCorner.src = 'img/tiles/bottom-right-corner.png';
 	},
 
 	createPlayer() {
@@ -298,7 +308,7 @@ const Game = {
 					64 + (i % 2) * 64 * 4,
 					64 + (Math.floor(i / 2) * this.canvas.height) / this.typesOfFood.length,
 					256 / 1.8,
-					128 / 1.8,
+					128 / 2,
 					`tiles/kitchen-${el}.png`,
 					el
 				)
@@ -323,7 +333,7 @@ const Game = {
 					this.canvas.height / this.numberOfClients +
 						Math.floor(i / 2) * (this.canvas.height - this.canvas.height / this.numberOfClients - 64 * this.numberOfClients),
 					64 * 1.2,
-					64 * 1.2,
+					64 * 1.3,
 					this.typesOfFood,
 					'tiles/table2.png'
 				)
@@ -357,11 +367,16 @@ const Game = {
 				this.context.drawImage(this.background, i * tileWidth, j * tileWidth, tileWidth, tileWidth);
 				if (i < (this.canvas.width / tileWidth) * 0.4)
 					this.context.drawImage(this.kitchenFloor, i * tileWidth, j * tileWidth, tileWidth, tileWidth);
-				this.context.drawImage(this.walls.left, 0 - tileWidth, j * tileWidth);
-				this.context.drawImage(this.walls.right, this.canvas.width - tileWidth / 2, j * tileWidth);
+				this.context.drawImage(this.walls.left, 0, j * tileWidth);
+				this.context.drawImage(this.walls.right, this.canvas.width - tileWidth, j * tileWidth);
 			}
-			this.context.drawImage(this.walls.top, i * tileWidth - tileWidth, 0 - tileWidth);
-			this.context.drawImage(this.walls.bottom, i * tileWidth, this.canvas.height - tileWidth / 2);
+			this.context.drawImage(this.walls.top, i * tileWidth, 0);
+			this.context.drawImage(this.walls.bottom, i * tileWidth, this.canvas.height - tileWidth / 2 + 5);
+
+			this.context.drawImage(this.walls.topLeftCorner, 0, 0);
+			this.context.drawImage(this.walls.topRightCorner, this.canvas.width - 64, 0);
+			this.context.drawImage(this.walls.bottomLeftCorner, 0, this.canvas.height - 63);
+			this.context.drawImage(this.walls.bottomRightCorner, this.canvas.width - 64, this.canvas.height - 63);
 		}
 	},
 
@@ -442,7 +457,7 @@ const Game = {
 
 	solidCanvasCollision(obj) {
 		if (obj.position.x < 0 + 64) obj.position.x = 64;
-		else if (obj.position.x + obj.size.w > this.width - 32) obj.position.x = this.width - obj.size.w - 32;
+		else if (obj.position.x + obj.size.w > this.width - 64) obj.position.x = this.width - obj.size.w - 64;
 
 		if (obj.position.y < 0 + 64) obj.position.y = 0 + 64;
 		else if (obj.position.y + obj.size.h > this.height - 32) obj.position.y = this.height - obj.size.h - 32;

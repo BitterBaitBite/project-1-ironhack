@@ -109,9 +109,9 @@ class Client extends Entity {
 			this.context.drawImage(
 				this.foodImage,
 				this.position.x + 42,
-				this.position.y + 17,
-				this.foodImage.width * 0.39,
-				this.foodImage.height * 0.32
+				this.position.y + 18,
+				this.foodImage.width * 0.4,
+				this.foodImage.height * 0.36
 			);
 		}
 
