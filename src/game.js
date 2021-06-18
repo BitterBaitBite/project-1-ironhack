@@ -17,6 +17,7 @@ const Game = {
 	insectElement: document.querySelector('.insect'),
 	satisfiedElement: document.querySelector('.satisfied'),
 	trashElement: document.querySelector('.trash'),
+	maxTimeElement: document.querySelector('.max-time'),
 
 	// Audio properties
 	musicController: document.getElementById('musicAudio'),
@@ -47,7 +48,7 @@ const Game = {
 	insectScore: 0,
 	satisfiedScore: 0,
 	trashScore: 0,
-	GAME_OVER_TIMER: 120,
+	GAME_OVER_TIMER: 90,
 
 	// Alert properties
 	alertCall: undefined,
@@ -82,6 +83,9 @@ const Game = {
 		this.canvas = document.getElementById('myCanvas');
 		this.context = this.canvas.getContext('2d');
 		this.setDimensions();
+
+		this.maxTimeElement.textContent = this.GAME_OVER_TIMER;
+
 		this.alertCall = new Image();
 		this.alertCall.src = 'img/tiles/call-player-alert.png';
 		this.alertFood = new Image(); // se crea el src al alertar la comida, dependiendo de la comida deseada
@@ -123,7 +127,12 @@ const Game = {
 				this.pressed = true;
 			}
 
-			e.key.toLowerCase() === this.keys.SPACE ? (this.SPACEDown = true) : null;
+			// e.key.toLowerCase() === this.keys.SPACE ? (this.SPACEDown = true) : null;
+
+			if (e.key.toLowerCase() === this.keys.SPACE && !this.pressed) {
+				this.SPACEDown = true;
+				this.pressed = true;
+			}
 		};
 
 		document.onkeyup = (e) => {
@@ -141,7 +150,12 @@ const Game = {
 				this.pressed = false;
 			}
 
-			e.key.toLowerCase() === this.keys.SPACE ? (this.SPACEDown = false) : null;
+			// e.key.toLowerCase() === this.keys.SPACE ? (this.SPACEDown = false) : null;
+
+			if (e.key.toLowerCase() === this.keys.SPACE) {
+				this.SPACEDown = false;
+				this.pressed = false;
+			}
 		};
 
 		this.resetButton.onclick = (e) => {
@@ -199,7 +213,7 @@ const Game = {
 
 			if (this.framesCounter % 60 === 0)
 				this.clients.forEach((el) => {
-					if (el.update()) {
+					if (el.update() && !el.satisfied) {
 						this.finishedClients++;
 					}
 				});
@@ -213,11 +227,7 @@ const Game = {
 
 			this.context.fillStyle = 'white';
 			this.context.font = '30px Arial';
-			this.context.fillText(
-				/* this.framesCounter + ' - ' +  */ this.secondsCounter /*  + ' - ' + this.totalScore */ + ' - ' + this.satisfiedScore,
-				20,
-				40
-			);
+			this.context.fillText(/* this.framesCounter + ' - ' +  */ this.secondsCounter + ' - ' + this.totalScore, 20, 40);
 
 			if (this.secondsCounter == this.GAME_OVER_TIMER || this.finishedClients >= 3) {
 				/* cambiar */
@@ -289,7 +299,7 @@ const Game = {
 					64 + (Math.floor(i / 2) * this.canvas.height) / this.typesOfFood.length,
 					256 / 1.8,
 					128 / 1.8,
-					'tiles/kitchen.png',
+					`tiles/kitchen-${el}.png`,
 					el
 				)
 			);
@@ -495,10 +505,12 @@ const Game = {
 
 	collisionCockroach(cockroach, index) {
 		if (this.isCollision(cockroach, this.player)) {
-			if (this.SPACEDown) {
+			if (this.SPACEDown && this.pressed) {
 				this.cockroaches.splice(index, 1);
 				this.insectScore++;
+				this.totalScore += 50;
 				this.playCockroachDeath();
+				this.SPACEDown = false;
 			}
 		}
 	},

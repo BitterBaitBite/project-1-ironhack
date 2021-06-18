@@ -29,6 +29,14 @@ hr {
 	background-color: rgb(89, 89, 121);
 }
 
+span {
+	font-weight: 700;
+}
+
+span.alert {
+	color: rgb(236, 0, 0);
+}
+
 #game-over-container {
 	display: flex;
 	flex-direction: column;
