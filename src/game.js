@@ -227,7 +227,7 @@ const Game = {
 
 			this.context.fillStyle = 'white';
 			this.context.font = '30px Arial';
-			this.context.fillText(/* this.framesCounter + ' - ' +  */ this.secondsCounter + ' - ' + this.totalScore, 20, 40);
+			this.context.fillText(/* this.framesCounter + ' - ' +  */ this.secondsCounter /*  + ' - ' + this.totalScore */, 20, 40);
 
 			if (this.secondsCounter == this.GAME_OVER_TIMER || this.finishedClients >= 3) {
 				/* cambiar */
