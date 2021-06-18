@@ -28,6 +28,7 @@ const Game = {
 
 	// Drawing properties
 	background: undefined,
+	kitchenFloor: undefined,
 	walls: undefined,
 	player: undefined,
 	interactMargin: 20,
@@ -254,6 +255,9 @@ const Game = {
 	createBackground() {
 		this.background = new Image();
 		this.background.src = 'img/tiles/floor.png';
+		this.kitchenFloor = new Image();
+		this.kitchenFloor.src = 'img/tiles/kitchen-floor.png';
+
 		this.walls = {
 			left: new Image(),
 			right: new Image(),
@@ -337,11 +341,12 @@ const Game = {
 
 	drawBackground() {
 		const tileWidth = 32 * 2;
-		this.context.fillStyle = 'lightgrey';
-		this.context.fillRect(0, 0, this.width, this.height);
+
 		for (let i = 0; i < this.canvas.width / tileWidth; i++) {
 			for (let j = 0; j < this.canvas.height / tileWidth; j++) {
 				this.context.drawImage(this.background, i * tileWidth, j * tileWidth, tileWidth, tileWidth);
+				if (i < (this.canvas.width / tileWidth) * 0.4)
+					this.context.drawImage(this.kitchenFloor, i * tileWidth, j * tileWidth, tileWidth, tileWidth);
 				this.context.drawImage(this.walls.left, 0 - tileWidth, j * tileWidth);
 				this.context.drawImage(this.walls.right, this.canvas.width - tileWidth / 2, j * tileWidth);
 			}
